@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <!-- ImagineInterface implementations -->
+        <parameter key="cravler_mongo_db_imagine.gd.class">Imagine\Gd\Imagine</parameter>
+        <parameter key="cravler_mongo_db_imagine.imagick.class">Imagine\Imagick\Imagine</parameter>
+        <parameter key="cravler_mongo_db_imagine.gmagick.class">Imagine\Gmagick\Imagine</parameter>
+    </parameters>
+
+    <services>
+        <!-- ImagineInterface instances -->
+        <service id="cravler.mongodb.imagine" alias="cravler.mongodb.imagine.gd" />
+        <service id="cravler.mongodb.imagine.gd" class="%cravler_mongo_db_imagine.gd.class%" />
+        <service id="cravler.mongodb.imagine.imagick" class="%cravler_mongo_db_imagine.imagick.class%" />
+        <service id="cravler.mongodb.imagine.gmagick" class="%cravler_mongo_db_imagine.gmagick.class%" />
+
+        <service id="cravler.mongodb.image_manager" class="%cravler_mongo_db_image.manager.class%">
+            <argument type="service" id="cravler.mongodb.imagine" />
+            <argument type="service" id="doctrine.odm.mongodb.document_manager" />
+            <argument>%cravler_mongo_db_image.document.class%</argument>
+            <argument>%cravler_mongo_db_image.allowed_file_types%</argument>
+            <argument>%cravler_mongo_db_image.width.min%</argument>
+            <argument>%cravler_mongo_db_image.height.min%</argument>
+            <argument>%cravler_mongo_db_image.width.max%</argument>
+            <argument>%cravler_mongo_db_image.height.max%</argument>
+        </service>
+    </services>
+
+</container>
