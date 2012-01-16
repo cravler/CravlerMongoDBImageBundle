@@ -513,12 +513,16 @@ class ImageManager
         if (is_string($file)) {
             $file = new File($file, false);
         }
-        return $file->guessExtension();
+        $guessExtension = $file->guessExtension();
 
-        // File extensions
-//        $imgInfo_array = getimagesize($img);
-//        $parts = explode('/', $imgInfo_array['mime']);
-//        $ext = $parts[count($parts)-1];
-//        return $ext;
+        if ($guessExtension) {
+            return $guessExtension;
+        }
+
+        $imgInfoArray = getimagesize($file->getPathname());
+        $parts = explode('/', $imgInfoArray['mime']);
+        $ext = $parts[count($parts) - 1];
+
+        return $ext;
     }
 }
