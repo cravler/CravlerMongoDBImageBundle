@@ -27,6 +27,8 @@
             <argument>%cravler_mongo_db_image.height.min%</argument>
             <argument>%cravler_mongo_db_image.width.max%</argument>
             <argument>%cravler_mongo_db_image.height.max%</argument>
+            <argument>%cravler_mongo_db_image.use_local_storage%</argument>
+            <argument>%cravler_mongo_db_image.web_dir%</argument>
         </service>
     </services>
 

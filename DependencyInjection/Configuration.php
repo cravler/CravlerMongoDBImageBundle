@@ -44,6 +44,8 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->booleanNode('use_local_storage')->defaultValue(false)->end()
+                ->scalarNode('web_dir')->defaultValue('%kernel.root_dir%/../web')->end()
                 ->scalarNode('driver')->defaultValue('gd')->cannotBeEmpty()->end()
                 ->scalarNode('document')->defaultValue('Cravler\Bundle\MongoDBImageBundle\Document\Image')->cannotBeEmpty()->end()
                 ->scalarNode('manager')->defaultValue('Cravler\Bundle\MongoDBImageBundle\Document\ImageManager')->cannotBeEmpty()->end()

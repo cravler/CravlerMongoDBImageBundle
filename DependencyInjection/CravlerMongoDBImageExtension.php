@@ -78,6 +78,8 @@ class CravlerMongoDBImageExtension extends Extension
 
         $this->remapParameters($config, $container,
             array(
+                'use_local_storage',
+                'web_dir',
                 'allowed_file_types',
                 'width.min',
                 'height.min',

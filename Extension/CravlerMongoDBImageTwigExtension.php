@@ -46,7 +46,9 @@ class CravlerMongoDBImageTwigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'imageDataEncode'  => new \Twig_Function_Method($this, 'imageDataEncode')
+            'imageDataEncode'  => new \Twig_Function_Method($this, 'imageDataEncode'),
+            'imageF1'          => new \Twig_Function_Method($this, 'imageF1'),
+            'imageF2'          => new \Twig_Function_Method($this, 'imageF2'),
         );
     }
 
@@ -58,11 +60,29 @@ class CravlerMongoDBImageTwigExtension extends \Twig_Extension
      * @param string $mode
      * @return string
      */
-    public function imageDataEncode($groupId, $width, $height, $mode = ImageManager::THUMBNAIL_INSET)
+    public static function imageDataEncode($groupId, $width, $height, $mode = ImageManager::THUMBNAIL_INSET)
     {
         return base64_encode(
             $groupId . '-' . $width . '-' . $height . '-' . $mode
         );
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public static function imageF1($value)
+    {
+        return substr(md5($value), -3, 3);
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public static function imageF2($value)
+    {
+        return substr(md5($value), -6, 3);
     }
 
     /**

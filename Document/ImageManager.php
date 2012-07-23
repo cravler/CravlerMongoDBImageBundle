@@ -34,6 +34,7 @@ use Imagine\Image\ManipulatorInterface;
 use Imagine\Image\Box;
 use Imagine\Exception\InvalidArgumentException;
 use Imagine\Exception\RuntimeException;
+use Cravler\Bundle\MongoDBImageBundle\Extension\CravlerMongoDBImageTwigExtension as TwigExtension;
 
 /**
  * @author Cravler <http://github.com/cravler>
@@ -56,6 +57,9 @@ class ImageManager
     protected $repository;
     protected $class;
 
+    protected $useLocalStorage = false;
+    protected $webDir = '';
+
     protected $minWidth  = 0; // the min width image we will accept
     protected $minHeight = 0; // the min height image we will accept
     protected $maxWidth  = 2048; // the max width image we will accept
@@ -77,7 +81,9 @@ class ImageManager
         $minWidth = null,
         $minHeight = null,
         $maxWidth = null,
-        $maxHeight = null
+        $maxHeight = null,
+        $useLocalStorage = false,
+        $webDir = ''
     )
     {
         $this->imagine    = $imagine;
@@ -100,6 +106,21 @@ class ImageManager
         if (count($allowedFileTypes)) {
             $this->allowedFileTypes = $allowedFileTypes;
         }
+
+        if ($useLocalStorage) {
+            $this->useLocalStorage = $useLocalStorage;
+            $this->webDir = $webDir;
+        }
+    }
+
+    public function hasLocalStorage()
+    {
+        return $this->useLocalStorage;
+    }
+
+    public function getWebDir()
+    {
+        return $this->webDir;
     }
 
     /**
@@ -140,6 +161,20 @@ class ImageManager
             $this->dm->flush();
         }
 
+        if ($this->hasLocalStorage()) {
+            $imageData = $this->getImageUrlData($dbImage);
+            $f1 = $this->getImageF1($imageData);
+            $f2 = $this->getImageF2($imageData);
+
+            $dir = $this->getWebDir() . '/img/' . $f1 . '/' .$f2;
+            if (!file_exists($dir)) {
+                mkdir($dir, 0755, true);
+                chmod($dir, 0755);
+            }
+            $filePath = $dir . '/' .$imageData;
+            file_put_contents($filePath, $dbImage->getFile()->getBytes());
+        }
+
         return $dbImage;
     }
 
@@ -178,6 +213,20 @@ class ImageManager
             );
             foreach ($images as $image) {
                 $this->deleteImage($image, false);
+            }
+        }
+
+        if ($this->hasLocalStorage()) {
+            foreach(array(self::THUMBNAIL_INSET, self::THUMBNAIL_OUTBOUND) as $mode) {
+                $imageData = $this->getImageUrlData($dbImage, null, null, $mode);
+                $f1 = $this->getImageF1($imageData);
+                $f2 = $this->getImageF2($imageData);
+
+                $dir = $this->getWebDir() . '/img/' . $f1 . '/' .$f2;
+                $filePath = $dir . '/' .$imageData;
+                if (file_exists($filePath)) {
+                    @unlink($filePath);
+                }
             }
         }
 
@@ -381,9 +430,25 @@ class ImageManager
      */
     public function getImageUrlData(ImageInterface $image, $width = null, $height = null, $mode = self::THUMBNAIL_INSET)
     {
-        return base64_encode(
-            $image->getGroupId() . '-' . ($width ?: $image->getWidth()) . '-' . ($height ?: $image->getHeight()) . '-' . $mode
-        );
+        return TwigExtension::imageDataEncode($image->getGroupId(), ($width ?: $image->getWidth()), ($height ?: $image->getHeight()), $mode);
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    public function getImageF1($value)
+    {
+        return TwigExtension::imageF1($value);
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    public function getImageF2($value)
+    {
+        return TwigExtension::imageF2($value);
     }
 
     /**

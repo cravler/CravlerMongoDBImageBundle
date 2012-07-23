@@ -5,5 +5,5 @@
 {% set dataAttr = dataAttr ~ ' data-' ~ attr ~ '="' ~ val ~ '"' %}
 {% endfor %}
 {% endif %}
-
-<img src="{{ path('image_show', {'imageData': imageDataEncode(groupId, width, height, mode|default('inset'))}) }}{{ noCache|default(false) ? ':nocache' : '' }}"{{ id|default('') ? [' id="', id, '"']|join|raw : '' }}{{ class|default('') ? [' class="', class, '"']|join|raw : '' }}{{ style|default('') ? [' style="', style, '"']|join|raw : '' }} alt="{{ alt|default('') }}"{{ dataAttr|raw }} />
+{% set imageData = imageDataEncode(groupId, width, height, mode|default('inset')) %}
+<img src="{{ path('image_show', {'f1': imageF1(imageData), 'f2': imageF2(imageData), 'imageData': imageData}) }}{{ noCache|default(false) ? ':nocache' : '' }}"{{ id|default('') ? [' id="', id, '"']|join|raw : '' }}{{ class|default('') ? [' class="', class, '"']|join|raw : '' }}{{ style|default('') ? [' style="', style, '"']|join|raw : '' }} alt="{{ alt|default('') }}"{{ dataAttr|raw }} />

@@ -37,7 +37,7 @@ class ImageController extends ContainerAware
      * @param $imageData
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction($imageData)
+    public function showAction($f1, $f2, $imageData)
     {
         $noCache = false;
         $parts = explode(':', $imageData);
@@ -79,11 +79,27 @@ class ImageController extends ContainerAware
         // [3] mode
         $parts = explode('-', base64_decode($imageData));
 
+        /* @var \Cravler\Bundle\MongoDBImageBundle\Document\ImageManager $imageManager */
         $imageManager = $this->container->get('cravler.mongodb.image_manager');
         $image = $imageManager->findOrCreate($parts[0], $parts[1], $parts[2], $parts[3]);
 
-        if ($image && is_object($image)) {
+        if ($image && is_object($image)
+                   && $f1 == $imageManager->getImageF1($imageData)
+                   && $f2 == $imageManager->getImageF2($imageData)
+        ) {
             $response->setContent($image->getFile()->getBytes());
+
+            if ($imageManager->hasLocalStorage()) {
+                $dir = $imageManager->getWebDir() . '/img/' . $f1 . '/' .$f2;
+                if (!file_exists($dir)) {
+                    mkdir($dir, 0755, true);
+                    chmod($dir, 0755);
+                }
+                $filePath = $dir . '/' .$imageData;
+                if ($noCache || !file_exists($filePath)) {
+                    file_put_contents($filePath, $image->getFile()->getBytes());
+                }
+            }
         }
         else {
             $response = new Response('Not found.', 404);
