@@ -162,16 +162,12 @@ class ImageManager
         }
 
         if ($this->hasLocalStorage()) {
-            $imageData = $this->getImageUrlData($dbImage);
-            $f1 = $this->getImageF1($imageData);
-            $f2 = $this->getImageF2($imageData);
-
-            $dir = $this->getWebDir() . '/img/' . $f1 . '/' .$f2;
+            $filePath = $this->getWebDir() . $this->getImagePath($dbImage);
+            $dir = substr($filePath, 0, -strlen(strrchr($filePath, '/')));
             if (!file_exists($dir)) {
                 mkdir($dir, 0755, true);
                 chmod($dir, 0755);
             }
-            $filePath = $dir . '/' .$imageData;
             file_put_contents($filePath, $dbImage->getFile()->getBytes());
         }
 
@@ -218,12 +214,7 @@ class ImageManager
 
         if ($this->hasLocalStorage()) {
             foreach(array(self::THUMBNAIL_INSET, self::THUMBNAIL_OUTBOUND) as $mode) {
-                $imageData = $this->getImageUrlData($dbImage, null, null, $mode);
-                $f1 = $this->getImageF1($imageData);
-                $f2 = $this->getImageF2($imageData);
-
-                $dir = $this->getWebDir() . '/img/' . $f1 . '/' .$f2;
-                $filePath = $dir . '/' .$imageData;
+                $filePath = $this->getWebDir() . $this->getImagePath($dbImage, null, null, $mode);
                 if (file_exists($filePath)) {
                     @unlink($filePath);
                 }
@@ -428,7 +419,23 @@ class ImageManager
      * @param string $mode
      * @return string
      */
-    public function getImageUrlData(ImageInterface $image, $width = null, $height = null, $mode = self::THUMBNAIL_INSET)
+    public function getImagePath(ImageInterface $image, $width = null, $height = null, $mode = self::THUMBNAIL_INSET)
+    {
+        $imageData = $this->getImageDataEncode($image, $width, $height, $mode);
+        $f1 = $this->getImageF1($imageData);
+        $f2 = $this->getImageF2($imageData);
+
+        return '/img/' . $f1 . '/' .$f2 . '/' .$imageData;
+    }
+
+    /**
+     * @param ImageInterface $image
+     * @param null|number $width
+     * @param null|number $height
+     * @param string $mode
+     * @return string
+     */
+    public function getImageDataEncode(ImageInterface $image, $width = null, $height = null, $mode = self::THUMBNAIL_INSET)
     {
         return TwigExtension::imageDataEncode($image->getGroupId(), ($width ?: $image->getWidth()), ($height ?: $image->getHeight()), $mode);
     }
