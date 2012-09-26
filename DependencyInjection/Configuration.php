@@ -50,7 +50,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('document')->defaultValue('Cravler\Bundle\MongoDBImageBundle\Document\Image')->cannotBeEmpty()->end()
                 ->scalarNode('manager')->defaultValue('Cravler\Bundle\MongoDBImageBundle\Document\ImageManager')->cannotBeEmpty()->end()
                 ->arrayNode('allowed_file_types')
-                    ->addDefaultsIfNotSet()
+                    //->addDefaultsIfNotSet()
                     ->requiresAtLeastOneElement()
                     ->beforeNormalization()
                         ->ifTrue(function($v){ return !is_array($v); })

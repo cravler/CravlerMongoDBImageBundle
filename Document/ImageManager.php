@@ -64,7 +64,7 @@ class ImageManager
     protected $minHeight = 0; // the min height image we will accept
     protected $maxWidth  = 2048; // the max width image we will accept
     protected $maxHeight = 2048; // the max height image we will accept
-    protected $allowedFileTypes = array('jpg','gif','png'); // the allowed filetypes
+    protected $allowedFileTypes = array('jpeg','jpg','gif','png'); // the allowed filetypes
 
     protected $lastError = '';
 
