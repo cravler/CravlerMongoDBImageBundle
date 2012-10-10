@@ -90,7 +90,7 @@ class ImageController extends ContainerAware
             $response->setContent($image->getFile()->getBytes());
 
             if ($imageManager->hasLocalStorage()) {
-                $filePath = $imageManager->getWebDir() . $imageManager->getImagePath($image);
+                $filePath = $imageManager->getWebDir() . $imageManager->getImagePath($image, null, null, $parts[3]);
                 $dir = substr($filePath, 0, -strlen(strrchr($filePath, '/')));
                 if (!file_exists($dir)) {
                     mkdir($dir, 0755, true);
